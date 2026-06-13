@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent Orchestrator</title>
+<meta name="description" content="Agentic orchestrator for parallel coding agents: plans tasks, spawns agents, and autonomously handles CI fixes, merge conflicts, and code reviews." />
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Agent Orchestrator" />
+<meta property="og:description" content="Agentic orchestrator for parallel coding agents: plans tasks, spawns agents, and autonomously handles CI fixes, merge conflicts, and code reviews." />
+<meta property="og:image" content="og-image.png" />
+<meta property="og:url" content="https://share.ao-agents.com" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Agent Orchestrator" />
+<meta name="twitter:description" content="Agentic orchestrator for parallel coding agents: plans tasks, spawns agents, and autonomously handles CI fixes, merge conflicts, and code reviews." />
+<meta name="twitter:image" content="og-image.png" />
+<link rel="icon" type="image/png" href="og-image.png" />
+<style>
+  :root {
+    --bg: #16261b;
+    --bg-2: #1b2e21;
+    --pill: #e9f1da;
+    --pill-hover: #dfe9cc;
+    --ink: #1a2118;
+    --muted: #6b7766;
+    --card: #ffffff;
+    --card-muted: #5f6b5a;
+    --accent: #6d3bf5;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 56px 18px 72px;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #20351f 0%, transparent 60%),
+      var(--bg);
+  }
+
+  .page { width: 100%; max-width: 560px; }
+
+  /* ---------- Header ---------- */
+  .header { text-align: center; margin-bottom: 26px; }
+
+  .avatar {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    background: #0d0d0f;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  }
+  .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+  }
+  .header p {
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: #aeb9ac;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Featured GitHub card ---------- */
+  .gh-card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 22px 22px 0;
+    margin-bottom: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 34px rgba(0,0,0,.28);
+  }
+  .gh-top { display: flex; gap: 16px; align-items: flex-start; }
+  .gh-body { flex: 1; min-width: 0; }
+  .gh-title {
+    color: #161b14;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .gh-title b { font-weight: 800; }
+  .gh-desc {
+    margin-top: 12px;
+    color: var(--card-muted);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .gh-pic {
+    width: 56px; height: 56px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #cfd8c5;
+  }
+
+  .gh-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    margin-top: 18px;
+  }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat .row { display: flex; align-items: center; gap: 6px; color: #161b14; font-weight: 600; font-size: 14px; }
+  .stat .row svg { width: 14px; height: 14px; opacity: .8; }
+  .stat .lbl { color: #8a948440; }
+  .stat .lbl { color: #97a18f; font-size: 11.5px; }
+
+  .gh-bar {
+    height: 8px;
+    border-radius: 6px;
+    margin: 18px 0 0;
+    background: linear-gradient(90deg, #4f7cf7 0%, #7a5cf0 38%, #d24fb0 68%, #f06d6d 100%);
+  }
+
+  .gh-foot {
+    margin: 16px -22px 0;
+    padding: 15px 22px;
+    border-top: 1px solid #eef1ea;
+    text-align: center;
+    color: #1d241b;
+    font-weight: 600;
+    font-size: 15px;
+    text-decoration: none;
+    display: block;
+    transition: background .15s ease;
+  }
+  .gh-foot:hover { background: #f6f8f2; }
+
+  /* ---------- Link pills ---------- */
+  .link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--pill);
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: 999px;
+    padding: 16px 22px;
+    margin-bottom: 14px;
+    font-size: 15.5px;
+    font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0,0,0,.18);
+    transition: transform .12s ease, background .15s ease;
+  }
+  .link:hover { background: var(--pill-hover); transform: translateY(-1px); }
+  .link:active { transform: translateY(0); }
+
+  .link .ico {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #0d0d0f;
+  }
+  .link .ico svg { width: 20px; height: 20px; }
+  .link .ico.plain { background: transparent; }
+  .link .ico.plain svg { width: 24px; height: 24px; }
+  .link .label { flex: 1; text-align: center; padding-right: 36px; }
+
+  .footer {
+    text-align: center;
+    margin-top: 34px;
+    color: #6f7a6c;
+    font-size: 12.5px;
+  }
+
+  @media (max-width: 420px) {
+    .header h1 { font-size: 21px; }
+    .gh-title { font-size: 19px; }
+    .gh-stats { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="avatar" aria-hidden="true">
+        <img src="og-image.png" alt="Agent Orchestrator logo" />
+      </div>
+      <h1>Agent Orchestrator</h1>
+      <p>Agentic orchestrator for parallel coding agents: plans tasks, spawns agents, and autonomously handles CI fixes, merge conflicts, and code reviews.</p>
+    </header>
+
+    <!-- Featured GitHub repo card -->
+    <section class="gh-card">
+      <div class="gh-top">
+        <div class="gh-body">
+          <div class="gh-title">AgentWrapper/<b>agent-orchestrator</b></div>
+          <div class="gh-desc">Agentic orchestrator for parallel coding agents: plans tasks, spawns agents, and autonomously handles CI fixes, merge conflicts, and code&hellip;</div>
+        </div>
+        <div class="gh-pic" aria-hidden="true"></div>
+      </div>
+
+      <div class="gh-bar"></div>
+
+      <a class="gh-foot" href="https://github.com/AgentWrapper/agent-orchestrator/" target="_blank" rel="noopener">Checkout the repo here</a>
+    </section>
+
+    <!-- Links -->
+    <a class="link" href="https://github.com/AgentWrapper/agent-orchestrator/" target="_blank" rel="noopener">
+      <span class="ico" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="#fff"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </span>
+      <span class="label">Checkout the repo here</span>
+    </a>
+
+    <a class="link" href="https://x.com/aoagents" target="_blank" rel="noopener">
+      <span class="ico" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="#fff"><path d="M9.5 6.8 14.6 1h-1.7L8.7 5.7 5.5 1H1l5.4 7.6L1 15h1.7l4.5-5.1 3.4 5.1H15L9.5 6.8Zm-1.6 1.8-.5-.7L3.3 2.2h1.9l3.1 4.3.5.7 4.1 5.8h-1.9L7.9 8.6Z"/></svg>
+      </span>
+      <span class="label">Follow us on X</span>
+    </a>
+
+    <a class="link" href="https://www.linkedin.com/company/agent-orchestrator" target="_blank" rel="noopener">
+      <span class="ico" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="#fff"><path d="M3 2.2a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6ZM1.9 6h2.2v7.8H1.9V6Zm4 0h2.1v1.07h.03C8.3 6.5 9.1 6 10.2 6c2.3 0 2.8 1.5 2.8 3.5v4.3h-2.2v-3.8c0-.9 0-2.07-1.26-2.07-1.27 0-1.46.98-1.46 2v3.85H5.9V6Z"/></svg>
+      </span>
+      <span class="label">Follow us on LinkedIn</span>
+    </a>
+
+    <a class="link" href="https://ao-agents.com" target="_blank" rel="noopener">
+      <span class="ico" aria-hidden="true">
+        <svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.2"><circle cx="8" cy="8" r="6.4"/><ellipse cx="8" cy="8" rx="2.6" ry="6.4"/><path d="M1.7 8h12.6M2.4 5.4h11.2M2.4 10.6h11.2"/></svg>
+      </span>
+      <span class="label">Visit our Website</span>
+    </a>
+
+    <p class="footer">Agent Orchestrator</p>
+
+  </main>
+</body>
+</html>
